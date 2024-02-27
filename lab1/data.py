@@ -2,6 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+
 def get_data():
     url = 'http://archive.ics.uci.edu/ml/machine-learning-databases/auto-mpg/auto-mpg.data'
     column_names = ['MPG', 'Cylinders', 'Displacement', 'Horsepower', 'Weight',
