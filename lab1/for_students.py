@@ -35,6 +35,29 @@ def calculate_mse(t_matrix, x_matrix, y_matrix):
     return sum([((t_matrix[0] + t_matrix[1] * x) - y) ** 2 for x, y in zip(x_matrix, y_matrix)]) / len(x_matrix)
 
 
+def plot_test_data(t_matrix, x_matrix, y_matrix):
+    x = np.linspace(min(x_matrix), max(x_matrix), 100)
+    y = float(t_matrix[0]) + float(t_matrix[1]) * x
+    plt.plot(x, y)
+    plt.scatter(x_matrix, y_matrix)
+    plt.xlabel('Weight')
+    plt.ylabel('MPG')
+    plt.show()
+
+
+def calculate_theta():
+    theta = [0, 0]
+    for i in range(100):
+        f = 2 / len(x_train_extended_normalized)
+        c1 = np.matmul(x_train_extended_normalized, theta)
+        c2 = np.subtract(c1, y_train_normalized)
+        c3 = np.matmul(x_train_extended_normalized.T, c2)
+        gradient = f * c3
+
+        theta = theta - 0.1 * gradient
+    return theta
+
+
 x_train_extended = extend_with_zeros(x_train)
 
 # Compute X^T X
@@ -51,14 +74,7 @@ theta_best = np.dot(XtX_inv_Xt, y_train)    # predicted output
 
 print(f"calculated MSE: {calculate_mse(theta_best, x_test, y_test)}")
 
-# plot the regression line
-x = np.linspace(min(x_test), max(x_test), 100)
-y = float(theta_best[0]) + float(theta_best[1]) * x
-plt.plot(x, y)
-plt.scatter(x_test, y_test)
-plt.xlabel('Weight')
-plt.ylabel('MPG')
-plt.show()
+plot_test_data(theta_best, x_test, y_test)
 
 x_test_normalized = (x_test - np.average(x_test)) / np.std(x_test)
 y_test_normalized = (y_test - np.average(y_test)) / np.std(y_test)
@@ -69,26 +85,8 @@ y_train_normalized = (y_train - np.average(y_train)) / np.std(y_train)
 x_train_extended_normalized = extend_with_zeros(x_train_normalized)
 
 # Define your initial guess for theta
-theta = [0, 0]
-for i in range(100):
+calculated_theta = calculate_theta()
 
-    f = 2 / len(x_train_extended_normalized)
-    c1 = np.matmul(x_train_extended_normalized, theta)
-    c2 = np.subtract(c1, y_train_normalized)
-    c3 = np.matmul(x_train_extended_normalized.T, c2)
-    gradient = f * c3
+print(f"gradient MSE: {calculate_mse(calculated_theta, x_test_normalized, y_test_normalized)}")
 
-    theta = theta - 0.1 * gradient
-
-theta_best = theta
-
-print(f"gradient MSE: {calculate_mse(theta_best, x_test_normalized, y_test_normalized)}")
-
-# plot the regression line
-x = np.linspace(min(x_test_normalized), max(x_test_normalized), 100)
-y = float(theta_best[0]) + float(theta_best[1]) * x
-plt.plot(x, y)
-plt.scatter(x_test_normalized, y_test_normalized)
-plt.xlabel('Weight')
-plt.ylabel('MPG')
-plt.show()
+plot_test_data(calculated_theta, x_test_normalized, y_test_normalized)
