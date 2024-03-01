@@ -49,12 +49,38 @@ def roulette_selection(items, knapsack_max_capacity, population) -> list:
     return selected
 
 
-def next_generation():
-    pass
+def crossover(population) -> list:
+    children = []
+
+    for i in range(0, len(population), 2):
+
+        p1 = population[i]
+        p2 = population[i + 1]
+
+        split_point = len(p1) // 2
+
+        child1 = p1[:split_point] + p2[split_point:]
+        child2 = p2[:split_point] + p1[split_point:]
+
+        children.append(child1)
+        children.append(child2)
+
+    return children
 
 
-def mutate():
-    pass
+def mutate(population, mutation_rate):
+    for individual in population:
+        for i in range(len(individual)):
+            r = random.random()
+            if r < mutation_rate:
+                individual[i] = random.choice((0, 1))
+
+
+def next_generation(items, knapsack_max_capacity, population) -> list:
+    parents = roulette_selection(items, knapsack_max_capacity, population)
+    children = crossover(parents)
+    mutate(children, 0.1)
+    return children
 
 
 def main():
@@ -75,8 +101,7 @@ def main():
     for _ in range(generations):
         population_history.append(population)
 
-        # TODO: implement genetic algorithm
-
+        population = next_generation(items, knapsack_max_capacity, population)
 
         best_individual, best_individual_fitness = population_best(items, knapsack_max_capacity, population)
         if best_individual_fitness > best_fitness:
