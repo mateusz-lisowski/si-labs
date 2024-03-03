@@ -71,3 +71,9 @@ class Connect4:
         else:
             print('now moves:', self.who_moves)
             print('possible drops:', self.possible_drops())
+
+    def __str__(self):
+        as_str = ''
+        for row in self.board:
+            as_str += ' '.join(row) + '\n'
+        return as_str
