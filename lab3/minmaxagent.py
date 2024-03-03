@@ -1,5 +1,4 @@
 import copy
-from dataclasses import dataclass
 from typing import Optional, TypedDict
 
 from exceptions import AgentException
@@ -9,11 +8,6 @@ from connect4 import Connect4
 class Node(TypedDict):
     state: Connect4
     value: list['Node'] | int
-
-
-@dataclass
-class Limit:
-    limit: int
 
 
 class MinMaxAgent:
@@ -53,19 +47,17 @@ class MinMaxAgent:
                 return new_connect4, 0
         return new_connect4, None
 
-    def generate_states(self, connect4_copy: Connect4, limit: Limit) -> list[Node]:
+    def generate_states(self, connect4_copy: Connect4, limit: int) -> list[Node]:
 
-        if limit.limit <= 0:
+        if limit <= 0:
             return [Node(state=connect4_copy, value=self.calculate_state())]
-        else:
-            limit.limit -= 1
 
         states: list[Node] = []
         for possible_drop in connect4_copy.possible_drops():
 
             new_game_state, result = self.do_move(connect4_copy, possible_drop)
             if result is None:
-                node = Node(state=new_game_state, value=self.generate_states(new_game_state, limit=limit))
+                node = Node(state=new_game_state, value=self.generate_states(new_game_state, limit=limit - 1))
                 states.append(node)
                 continue
             else:
@@ -77,15 +69,13 @@ class MinMaxAgent:
     def get_move(self, connect4_copy: Connect4) -> int:
         """Return number of on among the possible drops based on minmax algorithm."""
 
-        limit = Limit(10_000)
-
         best_moves: list[tuple[int, int]] = []
         for possible_drop in connect4_copy.possible_drops():
             new_game_state, result = self.do_move(connect4_copy, possible_drop)
             if result:
                 best_moves.append((possible_drop, result))
             else:
-                states = self.generate_states(new_game_state, limit)
+                states = self.generate_states(new_game_state, limit=4)
                 best_moves.append((possible_drop, MinMaxAgent.eval_states(states)))
 
         best_moves.sort(key=lambda move: move[1])
