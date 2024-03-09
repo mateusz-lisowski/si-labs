@@ -2,8 +2,7 @@ import numpy as np
 
 
 def initialize_centroids_forgy(data, k):
-    # TODO implement random initialization
-    return None
+    return np.random.uniform(np.amin(data, axis=0), np.amax(data, axis=0), size=(k, data.shape[1]))
 
 
 def initialize_centroids_kmeans_pp(data, k):
@@ -37,7 +36,7 @@ def k_means(data, num_centroids, kmeans_plus_plus=False):
         print(f"Intra distance after {i} iterations: {mean_intra_distance(data, assignments, centroids)}")
         centroids = update_centroids(data, assignments)
         new_assignments = assign_to_cluster(data, centroids)
-        if np.all(new_assignments == assignments): # stop if nothing changed
+        if np.all(new_assignments == assignments):  # stop if nothing changed
             break
         else:
             assignments = new_assignments
