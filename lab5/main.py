@@ -32,4 +32,4 @@ def clustering(kmeans_pp):
 
 if __name__ == '__main__':
     clustering(kmeans_pp=True)
-    # clustering(kmeans_pp = False)
+    # clustering(kmeans_pp=False)
