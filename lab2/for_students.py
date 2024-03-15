@@ -89,8 +89,6 @@ def main():
 
     population_size = 100
     generations = 200
-    n_selection = 20
-    n_elite = 1
 
     start_time = time.time()
     best_solution = None
@@ -100,9 +98,7 @@ def main():
     population = initial_population(len(items), population_size)
     for _ in range(generations):
         population_history.append(population)
-
         population = next_generation(items, knapsack_max_capacity, population)
-
         best_individual, best_individual_fitness = population_best(items, knapsack_max_capacity, population)
         if best_individual_fitness > best_fitness:
             best_solution = best_individual
