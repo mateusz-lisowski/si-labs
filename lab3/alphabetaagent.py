@@ -80,7 +80,7 @@ class AlphaBetaAgent:
             if result:
                 best_moves.append((possible_drop, result))
             else:
-                states = self.generate_states(new_game_state, limit=4)
+                states = self.generate_states(new_game_state, limit=3)
                 best_moves.append((possible_drop, AlphaBetaAgent.eval_states(states)))
 
         best_moves.sort(key=lambda move: move[1])
