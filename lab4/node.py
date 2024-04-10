@@ -76,11 +76,15 @@ class Node:
         if "feature_subset" not in params:
             params["feature_subset"] = range(X.shape[1])  # Use all features by default
 
+        feature_subset = params["feature_subset"]
+        if isinstance(feature_subset, int):
+            feature_subset = [feature_subset]
+
         self.node_prediction = np.mean(y)
         if X.shape[0] == 1 or self.node_prediction == 0 or self.node_prediction == 1:
             return True
 
-        self.feature_idx, self.feature_value = self.find_best_split(X, y, params["feature_subset"])
+        self.feature_idx, self.feature_value = self.find_best_split(X, y, feature_subset)
         if self.feature_idx is None:
             return True
 
