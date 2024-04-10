@@ -2,11 +2,11 @@ from collections import defaultdict
 import numpy as np
 from decision_tree import DecisionTree
 
+
 class RandomForest:
     def __init__(self, params):
         self.forest = []
         self.params = defaultdict(lambda: None, params)
-
 
     def train(self, X, y):
         for _ in range(self.params["ntrees"]):
@@ -28,7 +28,7 @@ class RandomForest:
         return forest_predictions
 
     def bagging(self, X, y):
-        X_selected, y_selected = None, None
-        # TODO implement bagging
-
+        num_samples = X.shape[0]
+        indices = np.random.choice(num_samples, size=num_samples, replace=True)
+        X_selected, y_selected = X[indices], y[indices]
         return X_selected, y_selected
