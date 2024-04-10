@@ -14,8 +14,23 @@ class Node:
     def gini_best_score(self, y, possible_splits):
         best_gain = -np.inf
         best_idx = 0
+        total_count = len(y)
 
-        # TODO find position of best data split
+        for idx in possible_splits:
+            left_y = y[:idx + 1]
+            right_y = y[idx + 1:]
+
+            # Calculate Gini score for the split
+            gini_left = 1 - sum((np.sum(left_y == c) / len(left_y)) ** 2 for c in np.unique(left_y))
+            gini_right = 1 - sum((np.sum(right_y == c) / len(right_y)) ** 2 for c in np.unique(right_y))
+
+            # Calculate weighted Gini score
+            weighted_gini = (len(left_y) / total_count) * gini_left + (len(right_y) / total_count) * gini_right
+
+            # Update best gain and index if current split provides better gain
+            if weighted_gini > best_gain:
+                best_gain = weighted_gini
+                best_idx = idx
 
         return best_idx, best_gain
 
@@ -34,16 +49,12 @@ class Node:
         best_gain = -np.inf
         best_split = None
 
-        # TODO implement feature selection
-
-        for d in range(X.shape[1]):
-            order = np.argsort(X[:, d])
-            y_sorted = y[order]
-            possible_splits = self.find_possible_splits(X[order, d])
-            idx, value = self.gini_best_score(y_sorted, possible_splits)
+        for feature_idx in feature_subset:
+            possible_splits = self.find_possible_splits(X[:, feature_idx])
+            idx, value = self.gini_best_score(y, possible_splits)
             if value > best_gain:
                 best_gain = value
-                best_split = (d, [idx, idx + 1])
+                best_split = (feature_idx, [idx, idx + 1])
 
         if best_split is None:
             return None, None
@@ -61,6 +72,9 @@ class Node:
             return self.right_child.predict(x)
 
     def train(self, X, y, params):
+
+        if "feature_subset" not in params:
+            params["feature_subset"] = range(X.shape[1])  # Use all features by default
 
         self.node_prediction = np.mean(y)
         if X.shape[0] == 1 or self.node_prediction == 0 or self.node_prediction == 1:
