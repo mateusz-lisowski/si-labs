@@ -1,4 +1,3 @@
-from collections import defaultdict
 import numpy as np
 
 
@@ -24,7 +23,6 @@ import numpy as np
 
 class Node:
     def __init__(self, feature_index=None, threshold=None, left=None, right=None, info_gain=None, value=None):
-
         # for decision node
         self.feature_index = feature_index
         self.threshold = threshold
@@ -45,6 +43,26 @@ class DecisionTree:
         # stopping conditions
         self.min_samples_split = min_samples_split
         self.max_depth = max_depth
+
+    @staticmethod
+    def calculate_gini(y):
+        class_labels = np.unique(y)
+        gini = 0
+        for cls in class_labels:
+            p_cls = len(y[y == cls]) / len(y)
+            gini += p_cls ** 2
+        return 1 - gini
+
+    @staticmethod
+    def calculate_leaf_value(array):
+        array = list(array)
+        return max(array, key=array.count)
+
+    @staticmethod
+    def split(dataset, feature_index, threshold):
+        dataset_left = np.array([row for row in dataset if row[feature_index] <= threshold])
+        dataset_right = np.array([row for row in dataset if row[feature_index] > threshold])
+        return dataset_left, dataset_right
 
     def train(self, dataset, curr_depth=0):
 
@@ -101,56 +119,23 @@ class DecisionTree:
         # return best split
         return best_split
 
-    def split(self, dataset, feature_index, threshold):
-        dataset_left = np.array([row for row in dataset if row[feature_index] <= threshold])
-        dataset_right = np.array([row for row in dataset if row[feature_index] > threshold])
-        return dataset_left, dataset_right
-
     def information_gain(self, parent, l_child, r_child):
         weight_l = len(l_child) / len(parent)
         weight_r = len(r_child) / len(parent)
-        return self.gini_index(parent) - (weight_l * self.gini_index(l_child) + weight_r * self.gini_index(r_child))
-
-    def gini_index(self, y):
-        class_labels = np.unique(y)
-        gini = 0
-        for cls in class_labels:
-            p_cls = len(y[y == cls]) / len(y)
-            gini += p_cls ** 2
-        return 1 - gini
-
-    def calculate_leaf_value(self, Y):
-
-        Y = list(Y)
-        return max(Y, key=Y.count)
-
-    def print_tree(self, tree=None, indent=" "):
-
-        if not tree:
-            tree = self.root
-
-        if tree.value is not None:
-            print(tree.value)
-
-        else:
-            print("X_" + str(tree.feature_index), "<=", tree.threshold, "?", tree.info_gain)
-            print("%sleft:" % (indent), end="")
-            self.print_tree(tree.left, indent + indent)
-            print("%sright:" % (indent), end="")
-            self.print_tree(tree.right, indent + indent)
+        return self.calculate_gini(parent) - (weight_l * self.calculate_gini(l_child) + weight_r * self.calculate_gini(r_child))
 
     def fit(self, X, Y):
         dataset = np.concatenate((X, Y), axis=1)
         self.root = self.train(dataset)
 
-    def predict(self, X):
-        preditions = [self.make_prediction(x, self.root) for x in X]
-        return preditions
-
     def make_prediction(self, x, tree):
-        if tree.value != None: return tree.value
+        if tree.value is not None:
+            return tree.value
         feature_val = x[tree.feature_index]
         if feature_val <= tree.threshold:
             return self.make_prediction(x, tree.left)
         else:
             return self.make_prediction(x, tree.right)
+
+    def predict(self, array):
+        return [self.make_prediction(x, self.root) for x in array]
