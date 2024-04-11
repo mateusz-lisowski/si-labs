@@ -4,7 +4,6 @@ from decision_tree import DecisionTree
 from random_forest import RandomForest
 from load_data import generate_data, load_titanic
 
-
 def main():
     np.random.seed(123)
 
@@ -20,6 +19,5 @@ def main():
     rf.evaluate(*train_data)
     rf.evaluate(*test_data)
 
-
-if __name__ == '__main__':
+if __name__=="__main__":
     main()

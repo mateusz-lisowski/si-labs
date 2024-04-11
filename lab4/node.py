@@ -1,5 +1,4 @@
 import copy
-
 import numpy as np
 
 
@@ -13,34 +12,33 @@ class Node:
 
     def gini_best_score(self, y, possible_splits):
         best_gain = -np.inf
-        best_idx = 0
-        total_count = len(y)
+        best_idx = None
 
         for idx in possible_splits:
-            left_y = y[:idx + 1]
-            right_y = y[idx + 1:]
+            left_count = np.sum(y[:idx + 1] == 0)
+            right_count = np.sum(y[idx + 1:] == 0)
+            total_count = len(y)
+            gini_left = 1 - ((left_count / (idx + 1)) ** 2 + ((idx + 1 - left_count) / (idx + 1)) ** 2)
+            gini_right = 1 - ((right_count / (total_count - (idx + 1))) ** 2 + (
+                        (total_count - (idx + 1) - right_count) / (total_count - (idx + 1))) ** 2)
+            gini_score = (idx + 1) / total_count * gini_left + (total_count - (idx + 1)) / total_count * gini_right
 
-            # Calculate Gini score for the split
-            gini_left = 1 - sum((np.sum(left_y == c) / len(left_y)) ** 2 for c in np.unique(left_y))
-            gini_right = 1 - sum((np.sum(right_y == c) / len(right_y)) ** 2 for c in np.unique(right_y))
-
-            # Calculate weighted Gini score
-            weighted_gini = (len(left_y) / total_count) * gini_left + (len(right_y) / total_count) * gini_right
-
-            # Update best gain and index if current split provides better gain
-            if weighted_gini > best_gain:
-                best_gain = weighted_gini
+            gain = 1 - gini_score
+            if gain > best_gain:
+                best_gain = gain
                 best_idx = idx
 
         return best_idx, best_gain
 
-    def split_data(self, X, y, idx, val):
+    @staticmethod
+    def split_data(X, y, idx, val):
         left_mask = X[:, idx] < val
         return (X[left_mask], y[left_mask]), (X[~left_mask], y[~left_mask])
 
-    def find_possible_splits(self, data):
+    @staticmethod
+    def find_possible_splits(data):
         possible_split_points = []
-        for idx in range(data.shape[0] - 1):
+        for idx in range(len(data) - 1):
             if data[idx] != data[idx + 1]:
                 possible_split_points.append(idx)
         return possible_split_points
@@ -49,12 +47,20 @@ class Node:
         best_gain = -np.inf
         best_split = None
 
-        for feature_idx in feature_subset:
-            possible_splits = self.find_possible_splits(X[:, feature_idx])
-            idx, value = self.gini_best_score(y, possible_splits)
+        # Select random features if feature_subset is specified
+        if feature_subset is not None:
+            features = np.random.choice(X.shape[1], feature_subset, replace=False)
+        else:
+            features = range(X.shape[1])
+
+        for d in features:
+            order = np.argsort(X[:, d])
+            y_sorted = y[order]
+            possible_splits = self.find_possible_splits(X[order, d])
+            idx, value = self.gini_best_score(y_sorted, possible_splits)
             if value > best_gain:
                 best_gain = value
-                best_split = (feature_idx, [idx, idx + 1])
+                best_split = (d, [idx, idx + 1])
 
         if best_split is None:
             return None, None
@@ -73,24 +79,17 @@ class Node:
 
     def train(self, X, y, params):
 
-        if "feature_subset" not in params:
-            params["feature_subset"] = range(X.shape[1])  # Use all features by default
-
-        feature_subset = params["feature_subset"]
-        if isinstance(feature_subset, int):
-            feature_subset = [feature_subset]
-
         self.node_prediction = np.mean(y)
-        if X.shape[0] == 1 or self.node_prediction == 0 or self.node_prediction == 1:
+        if len(X) == 1 or self.node_prediction == 0 or self.node_prediction == 1:
             return True
 
-        self.feature_idx, self.feature_value = self.find_best_split(X, y, feature_subset)
+        self.feature_idx, self.feature_value = self.find_best_split(X, y, params["feature_subset"])
         if self.feature_idx is None:
             return True
 
         (X_left, y_left), (X_right, y_right) = self.split_data(X, y, self.feature_idx, self.feature_value)
 
-        if X_left.shape[0] == 0 or X_right.shape[0] == 0:
+        if len(X_left) == 0 or len(X_right) == 0:
             self.feature_idx = None
             return True
 
