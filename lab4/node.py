@@ -10,7 +10,8 @@ class Node:
         self.feature_value = None
         self.node_prediction = None
 
-    def gini_best_score(self, y, possible_splits):
+    @staticmethod
+    def gini_best_score(y, possible_splits):
         best_gain = -np.inf
         best_idx = None
 
