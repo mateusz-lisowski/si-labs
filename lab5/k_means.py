@@ -16,6 +16,7 @@ def initialize_centroids_kmeans_pp(data, k):
         probabilities = distances / distances.sum()
         cumulative_probabilities = probabilities.cumsum()
         r = np.random.rand()
+        i = 0
         for j, p in enumerate(cumulative_probabilities):
             if r < p:
                 i = j
@@ -64,6 +65,7 @@ def k_means(data, num_centroids, kmeans_plus_plus=False):
         centroids = initialize_centroids_forgy(data, num_centroids)
 
     assignments = assign_to_cluster(data, centroids)
+    new_assignments = None
     for i in range(100):    # max number of iteration = 100
         print(f"Intra distance after {i} iterations: {mean_intra_distance(data, assignments, centroids)}")
         centroids = update_centroids(data, assignments, centroids)
