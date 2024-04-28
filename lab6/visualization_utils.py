@@ -9,18 +9,20 @@ def inspect_data(x, y, show_first_n=4, x_test=None, y_test=None):
     print(f'First {show_first_n} (x, y) data pairs:')
     for xi, yi in zip(x[:show_first_n], y[:show_first_n]):
         print(f'{xi} => {yi}')
-        
+
 
 def visualize_activation_function(func):
     logits = np.linspace(-10, 10, 1001)
-    
+
     plt.axhline(y=0, color="gray", linestyle="-")
     plt.axhline(y=1.0, color="gray", linestyle="--")
     plt.axhline(y=-1.0, color="gray", linestyle="--")
     plt.axvline(color="gray")
     plt.plot(logits, func(logits), 'r-', linewidth=3)
     plt.ylim(-1.2, 1.2)
-    plt.title(f'Function: {func.__name__}'); plt.xlabel('logits'); plt.ylabel('y');
+    plt.title(f'Function: {func.__name__}')
+    plt.xlabel('logits')
+    plt.ylabel('y')
     plt.show()
 
 
@@ -33,7 +35,6 @@ def x_data_from_grid(min_xy, max_xy, grid_size, dtype=np.float32):
 def plot_data(x, y, ax=None, plot_xy_range=None, x_grid=None, y_grid=None,
               add_bar=True, axes_lines=True, x_test=None, y_test=None,
               x1_label='x1', x2_label='x2', title='Input space', do_show=True):
-
     if ax is None:
         ax = plt.gca()
     plt.sca(ax)
