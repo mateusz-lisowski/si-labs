@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-import torch.nn.functional as F
+import torch.nn.functional as f
 from data import ClassificationTwoSpiralsData
 from visualization_utils import inspect_data, plot_data, x_data_from_grid
 import matplotlib.pyplot as plt
@@ -22,28 +22,28 @@ class TorchMultiLayerNetwork(nn.Module):
 
     def forward(self, x_data):
         x = x_data
-        for l in self.layers[:-1]:
-            x = F.relu(l(x))
+        for layer in self.layers[:-1]:
+            x = f.relu(layer(x))
         return torch.sigmoid(self.layers[-1](x))
 
 
 def evaluate_model(model, x, y):
-    with torch.no_grad():                       # przy ewaluacji nie ma potrzeby liczyć gradientów
+    with torch.no_grad():  # przy ewaluacji nie ma potrzeby liczyć gradientów
         y_pred = torch.round(model.forward(x))
         acc = (y == y_pred).sum().item() / y.shape[0]
     return acc
 
 
 def training(model, x, y):
-
     # training hiperparameters
     n_steps = 50000
-    learning_rate = 0.1        # try different values
+    learning_rate = 0.1  # try different values
     minibatch_size = 32
 
-    loss_fn = F.binary_cross_entropy
+    loss_fn = f.binary_cross_entropy
 
-    history = []; i_step=0
+    history = []
+    i_step = 0
 
     # pętla uczenia gradientowego
     for _ in range(n_steps):
@@ -60,9 +60,11 @@ def training(model, x, y):
 
         # backward pass
         for p in model.parameters():
-            p.grad = None  # gradienty są akumulowane, więc przed następnym krokiem trzeba je zresetować (specyfika pyTorch)
+            p.grad = None  # gradienty są akumulowane, więc przed następnym krokiem
+            # trzeba je zresetować (specyfika pyTorch)
+
         loss.backward()  # autograd - policzenie gradientów metodą wstecznej propagacji - wypełnia pola .grad każdego
-                         # z parametrów, który wpływa na wartość loss
+        # z parametrów, który wpływa na wartość loss
 
         # update params
         with torch.no_grad():  # Update parameters using gradient descent
@@ -81,9 +83,10 @@ def training(model, x, y):
 def plot_history(history, smoothing_factor=0.99):
     plt.plot(history, c='b', alpha=0.5)
     if smoothing_factor is not None:
-        smoothed_history = []; pv = history[0]
+        smoothed_history = []
+        pv = history[0]
         for v in history:
-            smoothed_history.append(smoothed := smoothing_factor*pv + (1.0-smoothing_factor)*v)
+            smoothed_history.append(smoothed := smoothing_factor * pv + (1.0 - smoothing_factor) * v)
             pv = smoothed
         plt.plot(smoothed_history, c='b')
     plt.xlabel('Training step')
@@ -93,7 +96,6 @@ def plot_history(history, smoothing_factor=0.99):
 
 def classify_spirals(student_id, do_data_inspection=True, do_model_inpection=True, do_model_training=True,
                      load_trained_model=False):
-
     model_path = "my_model.pkl"
 
     # generacja danych
@@ -127,11 +129,11 @@ def classify_spirals(student_id, do_data_inspection=True, do_model_inpection=Tru
         print(model)
         print("Aktualne wagi:")
         for name, param in model.named_parameters():
-            print(name, param.data)                 # początkowo wagi losowe
+            print(name, param.data)  # początkowo wagi losowe
         print("Aktualne gradienty:")
         for name, param in model.named_parameters():
-            print(name, param.requires_grad)        # czy dla tego parametru będzie potrzebne liczenie gradientu
-            print(name, param.grad)                 # aktualna wartość gradientu
+            print(name, param.requires_grad)  # czy dla tego parametru będzie potrzebne liczenie gradientu
+            print(name, param.grad)  # aktualna wartość gradientu
 
     print(f'Train accuracy: {evaluate_model(model, x_train, y_train) * 100:.02f}%')
     print(f'Test accuracy: {evaluate_model(model, x_test, y_test) * 100:.02f}%')
@@ -156,9 +158,8 @@ def classify_spirals(student_id, do_data_inspection=True, do_model_inpection=Tru
               plot_xy_range=[-1.2, 1.2], x_grid=x_grid, y_grid=y_pred_grid.numpy())
 
 
-if __name__ == '__main__':
-
-    student_id = 193396         # Twój numer indeksu, np. 102247
+def main():
+    student_id = 193396  # Twój numer indeksu, np. 102247
     torch.manual_seed(student_id)
 
     classify_spirals(student_id,
@@ -166,3 +167,7 @@ if __name__ == '__main__':
                      do_model_inpection=True,
                      do_model_training=True,
                      load_trained_model=False)
+
+
+if __name__ == '__main__':
+    main()
