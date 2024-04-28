@@ -1,5 +1,5 @@
 import numpy as np
-from data import LinearlySeparableClasses, NonlinearlySeparableClasses
+from data import LinearlySeparableClasses, NonlinearSeparableClasses
 from visualization_utils import inspect_data, plot_data, x_data_from_grid, visualize_activation_function, \
     plot_two_layer_activations
 
@@ -9,13 +9,16 @@ from visualization_utils import inspect_data, plot_data, x_data_from_grid, visua
 def relu(logits):
     return np.maximum(logits, 0)
 
+
 def sigmoid(logits):
     return 1. / (1. + np.exp(-logits))
     # return np.exp(-np.logaddexp(0, -logits))     # to samo co wyżej, ale stabilne numerycznie
 
+
 def hardlim(logits):
     return (logits > 0).astype(np.float32)
     # return np.round(sigmoid(logits))             # to samo co wyżej, bez wykorzystywania porównań i rzutowań
+
 
 def linear(logits):
     return logits
@@ -42,15 +45,13 @@ def zad1_single_neuron(student_id):
             :param x_data: wejście neuronu: np.array o rozmiarze [n_samples, n_in]
             :return: wyjście neuronu: np.array o rozmiarze [n_samples, 1]
             """
-            # TODO (0.5 point)
-            raise NotImplementedError()
+            return self.f_act(np.dot(x_data, self.W) + self.b)
 
     # neuron zainicjowany losowymi wagami
     model = SingleNeuron(n_in=n_features, f_act=hardlim)
 
-    # TODO: ustawienie właściwych wag (0.5 point)
-    # model.W[:, 0] = [w1, w2]
-    # model.b[:] = [b1]
+    model.W[:, 0] = [0, -0.1]
+    model.b[:] = [0]
 
     # działanie i ocena modelu
     y_pred = model.forward(x)
@@ -63,7 +64,7 @@ def zad1_single_neuron(student_id):
 
 
 def zad2_two_layer_net(student_id):
-    gen = NonlinearlySeparableClasses()
+    gen = NonlinearSeparableClasses()
     x, y = gen.generate_data(seed=student_id)
     n_samples, n_features = x.shape
 
@@ -109,10 +110,14 @@ def zad2_two_layer_net(student_id):
     plot_two_layer_activations(model, x, y)
 
 
-if __name__ == '__main__':
+def main():
     # visualize_activation_function(relu)
 
-    student_id = None         # Twój numer indeksu, np. 102247
+    student_id = 193396         # Twój numer indeksu, np. 102247
 
     zad1_single_neuron(student_id)
     # zad2_two_layer_net(student_id)
+
+
+if __name__ == '__main__':
+    main()
