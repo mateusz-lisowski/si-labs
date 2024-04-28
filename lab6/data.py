@@ -86,8 +86,8 @@ class LogicGateData(DataGenerator):
     def generate_data(self, **kwargs):
         x_data = np.array([[0, 0],
                            [0,  1],
-                           [ 1, 0],
-                           [ 1,  1]], dtype=np.float32)
+                           [1, 0],
+                           [1,  1]], dtype=np.float32)
         if self._gate_type == 'xor':
             labels = np.logical_xor(x_data[:, 0], x_data[:, 1])
         elif self._gate_type == 'and':
@@ -124,7 +124,7 @@ class LinearlySeparableClasses(RotatedLogicGateData):
         super().__init__(gate_type='and')
 
 
-class NonlinearlySeparableClasses(RotatedLogicGateData):
+class NonlinearSeparableClasses(RotatedLogicGateData):
     def __init__(self):
         super().__init__(gate_type='xor')
 
