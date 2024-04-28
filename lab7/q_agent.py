@@ -1,5 +1,5 @@
 import numpy as np
-from rl_lab.rl_base import Agent, Action, State
+from lab7.rl_base import Agent, Action, State
 import os
 
 

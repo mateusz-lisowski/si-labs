@@ -1,6 +1,6 @@
-from rl_lab.rl_base import Env
+from lab7.rl_base import Env
 import numpy as np
-from rl_lab.gui.pygame_config import *
+from lab7.gui.pygame_config import *
 
 
 # a constant grid world (the locations of pits/wumpus objects are always the same)

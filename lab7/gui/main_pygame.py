@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 
 from .pygame_config import *
-from rl_lab.rl_base import Env, Agent
+from lab7.rl_base import Env, Agent
 
 
 def key_logic(auto_mode, done):

@@ -1,5 +1,5 @@
 from time import sleep
-from rl_lab.rl_base import Agent, State, Action
+from lab7.rl_base import Agent, State, Action
 import pygame
 
 from pygame.locals import (
