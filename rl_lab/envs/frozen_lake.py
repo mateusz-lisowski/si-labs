@@ -31,10 +31,14 @@ class FrozenLake(Env):
         assert self.intended_action_prob + 2*self.side_from_intended_prob + self.opposite_from_intended_prob == 1.0, \
             "action probabilities must sum to 1.0"
         self.action_prob = {
-            0: np.array([self.intended_action_prob, self.opposite_from_intended_prob, self.side_from_intended_prob, self.side_from_intended_prob]),
-            1: np.array([self.opposite_from_intended_prob, self.intended_action_prob, self.side_from_intended_prob, self.side_from_intended_prob]),
-            2: np.array([self.side_from_intended_prob, self.side_from_intended_prob, self.intended_action_prob, self.opposite_from_intended_prob]),
-            3: np.array([self.side_from_intended_prob, self.side_from_intended_prob, self.opposite_from_intended_prob, self.intended_action_prob])
+            0: np.array([self.intended_action_prob, self.opposite_from_intended_prob,
+                         self.side_from_intended_prob, self.side_from_intended_prob]),
+            1: np.array([self.opposite_from_intended_prob, self.intended_action_prob,
+                         self.side_from_intended_prob, self.side_from_intended_prob]),
+            2: np.array([self.side_from_intended_prob, self.side_from_intended_prob,
+                         self.intended_action_prob, self.opposite_from_intended_prob]),
+            3: np.array([self.side_from_intended_prob, self.side_from_intended_prob,
+                         self.opposite_from_intended_prob, self.intended_action_prob])
         }
 
         self.cave_entry_x = 0
@@ -51,11 +55,13 @@ class FrozenLake(Env):
 
     def get_new_env(self):
         if self.bigger_grid:
-            return [[self.gold_field, self.regular_field, self.regular_field, self.regular_field, self.coin_field],
-                    [self.pit_field, self.regular_field, self.regular_field, self.regular_field, self.regular_field],
-                    [self.regular_field, self.regular_field, self.regular_field, self.regular_field, self.regular_field],
-                    [self.regular_field, self.regular_field, self.regular_field, self.pit_field, self.regular_field],
-                    [self.regular_field, self.regular_field, self.regular_field, self.pit_field, self.coin_field]]
+            return [
+                [self.gold_field, self.regular_field, self.regular_field, self.regular_field, self.coin_field],
+                [self.pit_field, self.regular_field, self.regular_field, self.regular_field, self.regular_field],
+                [self.regular_field, self.regular_field, self.regular_field, self.regular_field, self.regular_field],
+                [self.regular_field, self.regular_field, self.regular_field, self.pit_field, self.regular_field],
+                [self.regular_field, self.regular_field, self.regular_field, self.pit_field, self.coin_field]
+            ]
         else:
             return [[self.regular_field, self.regular_field, self.gold_field, self.pit_field],
                     [self.pit_field, self.regular_field, self.regular_field, self.regular_field],
@@ -157,7 +163,8 @@ class FrozenLake(Env):
 
                     state = self.get_state(y, x)
                     sorted_actions = np.argsort(q_values[state])
-                    if q_values[state, sorted_actions[3]] > q_values[state, sorted_actions[2]]:  # there is a clear best action
+                    if q_values[state, sorted_actions[3]] > q_values[state, sorted_actions[2]]:
+                        # there is a clear best action
                         best = sorted_actions[3]
 
                     arrows = {0: self.assets['arrow_up'],
@@ -195,7 +202,9 @@ class FrozenLake(Env):
 
                     for a in range(4):
                         color = GREEN_DARK if best is not None and a == best else RED
-                        msg = self.assets['q_values_font'].render(f"{q_values[self.get_state(y, x), a]:04.1f}", False, color)
+                        msg = self.assets['q_values_font'].render(
+                            f"{q_values[self.get_state(y, x), a]:04.1f}", False, color
+                        )
                         screen.blit(msg, set_position(msg.get_rect(), a))
 
         for t in range(len(text)):
